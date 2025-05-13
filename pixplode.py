@@ -1,7 +1,7 @@
 import argparse
 import time
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 
 import cv2
 import matplotlib.pyplot as plt
@@ -78,8 +78,8 @@ class QuadNode:
         self.height = height
         self.depth = depth                      
         self.children: List['QuadNode'] = []
-        self.patch = None                 
-        self.color = None    
+        self.patch: Optional[patches.Patch] = None
+        self.color: Optional[np.ndarray] = None
 
     def subdivide(self) -> None:
         """
@@ -158,7 +158,7 @@ class InteractiveQuadtreeRenderer:
         self.shape = shape
         self.minimum_size_pixel = minimum_size_pixel
         self.event_type = event_type
-        self.output_image_path = output_image_path
+        self.output_image_path: Optional[str] = output_image_path
         self.last_subdivide_time = 0
         self.root = QuadNode(0, 0, image.shape[1], image.shape[0])
         self.fig, self.ax = self._setup_display()
@@ -315,8 +315,7 @@ class InteractiveQuadtreeRenderer:
         x, y = event.xdata, event.ydata
         leaf = self._find_leaf(self.root, x, y)
         if (leaf.is_leaf() and
-            leaf.width >= 2 * self.minimum_size_pixel and
-            leaf.height >= 2 * self.minimum_size_pixel):
+            min(leaf.width, leaf.height) >= 2 * self.minimum_size_pixel):
             self._subdivide_and_draw(leaf)
             self.last_subdivide_time = time.time()
 
@@ -474,13 +473,13 @@ def main() -> None:
 
     image = image.astype(float) / 255
     original_height, original_width = image.shape[:2]
-    scale = args.resize_maximum_dimension_to / max(
-        original_height, original_width
-    )
-    if scale > 1:
-        image = cv2.resize(
-            image, None, fx=scale, fy=scale, interpolation=cv2.INTER_AREA
-        )
+    if args.resize_maximum_dimension_to > 0:
+        current_max_dim = max(original_height, original_width)
+        if current_max_dim > args.resize_maximum_dimension_to:
+            scale = args.resize_maximum_dimension_to / current_max_dim
+            image = cv2.resize(
+                image, None, fx=scale, fy=scale, interpolation=cv2.INTER_AREA
+            )
 
     renderer = InteractiveQuadtreeRenderer(
         image=image,
