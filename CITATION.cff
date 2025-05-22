@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: >
+  If you use this software, please cite it using the following metadata.
+title: Pixplode
+version: 1.0.0
+date-released: 2025-05-21
+authors:
+  - family-names: Salvaggio
+    given-names: Carl
+    affiliation: Rochester Institute of Technology
+    orcid: https://orcid.org/0000-0001-9293-9696
+abstract: >
+  Pixplode is an interactive quadtree renderer for image decomposition using hover or click events. It supports spatial subdivision and visualization of image regions with custom parameters.
+repository-code: https://github.com/csalvaggio/pixplode
+license: MIT
+keywords:
+  - image processing
+  - quadtree
+  - interactive visualization
+  - Python
+  - computer vision
+
